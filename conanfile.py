@@ -2,8 +2,8 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 
 
-class pifantunerdRecipe(ConanFile):
-    name = "pifantunerd"
+class pifantunerRecipe(ConanFile):
+    name = "pifantuner"
     version = "0.1.0"
     package_type = "library"
 
@@ -11,7 +11,7 @@ class pifantunerdRecipe(ConanFile):
     license = "<Put the package license here>"
     author = "<Put your name here> <And your email here>"
     url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of pifantunerd package here>"
+    description = "<Description of pifantuner package here>"
     topics = ("<Put some tag here>", "<here>", "<and here>")
 
     requires = "libgpiod/1.6.3"
@@ -51,7 +51,7 @@ class pifantunerdRecipe(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["pifantunerd"]
+        self.cpp_info.libs = ["pifantuner"]
 
     
 

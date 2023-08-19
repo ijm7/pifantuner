@@ -1,10 +1,9 @@
 #pragma once
 
-#ifdef _WIN32
-  #define PIFANTUNERD_EXPORT __declspec(dllexport)
-#else
-  #define PIFANTUNERD_EXPORT
-#endif
+typedef struct pifantuner_s {
+		
+} pifantuner_t;
 
-//PIFANTUNERD_EXPORT void pifantunerd();
-//PIFANTUNERD_EXPORT void pifantunerd_print_vector(const std::vector<std::string> &strings);
+pifantuner_t *pifantuner_create(void);
+
+void pifantuner_destroy(pifantuner_t *pifantuner);
