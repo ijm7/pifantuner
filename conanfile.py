@@ -14,6 +14,8 @@ class pifantunerdRecipe(ConanFile):
     description = "<Description of pifantunerd package here>"
     topics = ("<Put some tag here>", "<here>", "<and here>")
 
+    requires = "libgpiod/1.6.3"
+
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False]}
