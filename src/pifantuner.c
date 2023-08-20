@@ -14,16 +14,17 @@ static float pifantuner_get_cpu_temperature(void) {
 
 		FILE *fd = fopen(cpu_temperature_file, "r");
 		if (!fd) {
+				// TODO logging
 				goto error;
 		}
 
 		int current_temperature;
 		if (fscanf(fd, "%d", &current_temperature) != 1) {
-				// TODO
+				// TODO logging
 				goto error;
 		}
 		else if (errno == ERANGE) {
-				// TODO
+				// TODO logging
 				goto error;
 		}
 
@@ -31,6 +32,16 @@ static float pifantuner_get_cpu_temperature(void) {
 error:
 		fclose(fd);
 		return cpu_temp_degrees;
+}
+
+static void pifantuner_control(const pifantuner_t *pifantuner) {
+		static constexpr const pifantuner_map_t default_settings[] = {
+				{55, 10},
+				{60, 55},
+				{65, 100}
+		};
+		const float current_temperature = pifantuner_get_cpu_temperature();
+		
 }
 
 pifantuner_t *pifantuner_create(void) {
