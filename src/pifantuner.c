@@ -48,7 +48,7 @@ void pifantuner_poll(const pifantuner_t *pifantuner) {
 		const float current_temperature = pifantuner_get_cpu_temperature();
 		static const size_t settings_size = sizeof(default_settings) / sizeof(default_settings[0]);
 		uint8_t new_setting = 0;
-		for (int i; i < settings_size; i++) {
+		for (int i = 0; i < settings_size; i++) {
 				if (current_temperature >= default_settings[i].temperature) {
 						new_setting = default_settings[i].temperature;
 				}
