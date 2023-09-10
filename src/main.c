@@ -12,22 +12,22 @@ static void signal_handler(int) {
 		run = false;
 }
 
-static void run_daemon(const pifantuner_t *pifantuner) {
+static void run_daemon(const struct pifantuner_ctx *ctx) {
 		while (run) {
-				pifantuner_poll(pifantuner);
+				pifantuner_poll(ctx);
 				sleep(poll_time_seconds);
 		}
 }
 
 int main(int argc, char **argv) {
 		signal(SIGINT, signal_handler);
-		pifantuner_t *pifantuner = pifantuner_create();
-		if (!pifantuner) {
+		struct pifantuner_ctx *ctx = pifantuner_create();
+		if (!ctx) {
 				return 1;
 		}
-		run_daemon(pifantuner);
+		run_daemon(ctx);
 
-		pifantuner_destroy(pifantuner);
+		pifantuner_destroy(ctx);
 		return 0;
 }
 
