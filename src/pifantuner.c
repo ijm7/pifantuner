@@ -18,17 +18,14 @@ static float pifantuner_get_cpu_temperature(void) {
 
 		FILE *fd = fopen(cpu_temperature_file, "r");
 		if (!fd) {
-				// TODO logging
 				goto error;
 		}
 
 		int current_temperature;
 		if (fscanf(fd, "%d", &current_temperature) != 1) {
-				// TODO logging
 				goto error;
 		}
 		else if (errno == ERANGE) {
-				// TODO logging
 				goto error;
 		}
 
@@ -66,7 +63,7 @@ struct pifantuner_ctx *pifantuner_create(void) {
 		}
 		ctx->interface = &argon_fan_iface;
 		ctx->interface->create(ctx);
- 
+
 		return ctx;
 error:
 		pifantuner_destroy(ctx);

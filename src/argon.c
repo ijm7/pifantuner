@@ -43,11 +43,11 @@ static int argon_fan_iface_create(struct pifantuner_ctx *ctx) {
 		}
 		handle->file = open("/dev/i2c-1", O_RDWR);
 		if (handle->file < 0) {
-				// TODO
+				goto error;
 		}
 		static const int addr = 0x1a;
 		if (ioctl(handle->file, I2C_SLAVE, addr) < 0) {
-				// TODO
+				goto error;
 		}
 
 		ctx->handle = handle;
