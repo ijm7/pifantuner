@@ -1,16 +1,16 @@
 #include "pifantuner.h"
 
 #include <assert.h>
-#include <linux/i2c-dev.h>
-#include <i2c/smbus.h>
-#include <fcntl.h>
-#include <stdio.h>
 #include <ctype.h>
-#include <stdint.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
+
+#include <fcntl.h>
+
+#include "argon.h"
 
 static float pifantuner_get_cpu_temperature(void) {
 		static const char cpu_temperature_file[] = "/sys/class/thermal/thermal_zone0/temp";
@@ -18,17 +18,14 @@ static float pifantuner_get_cpu_temperature(void) {
 
 		FILE *fd = fopen(cpu_temperature_file, "r");
 		if (!fd) {
-				// TODO logging
 				goto error;
 		}
 
 		int current_temperature;
 		if (fscanf(fd, "%d", &current_temperature) != 1) {
-				// TODO logging
 				goto error;
 		}
 		else if (errno == ERANGE) {
-				// TODO logging
 				goto error;
 		}
 
@@ -38,9 +35,9 @@ error:
 		return cpu_temp_degrees;
 }
 
-void pifantuner_poll(const pifantuner_t *pifantuner) {
-		assert(pifantuner);
-		static const pifantuner_map_t default_settings[] = {
+void pifantuner_poll(const struct pifantuner_ctx *ctx) {
+		assert(ctx);
+		static const struct pifantuner_map default_settings[] = {
 				{55, 10},
 				{60, 55},
 				{65, 100}
@@ -54,34 +51,30 @@ void pifantuner_poll(const pifantuner_t *pifantuner) {
 				}
 		}
 
-		i2c_smbus_write_byte(pifantuner->file, new_setting);
+		assert(ctx->interface);
+		assert(ctx->interface->update);
+		ctx->interface->update(ctx, new_setting);
 }
 
-pifantuner_t *pifantuner_create(void) {
-		pifantuner_t *pifantuner = malloc(sizeof(pifantuner_t));
-		if (!pifantuner) {
+struct pifantuner_ctx *pifantuner_create(void) {
+		struct pifantuner_ctx *ctx = malloc(sizeof(struct pifantuner_ctx));
+		if (!ctx) {
 				goto error;
 		}
-		pifantuner->file = open("/dev/i2c-1", O_RDWR);
-		if (pifantuner->file < 0) {
-				// TODO
-		}
-		static const int addr = 0x1a;
-		if (ioctl(pifantuner->file, I2C_SLAVE, addr) < 0) {
-				// TODO
-		}
+		ctx->interface = &argon_fan_iface;
+		ctx->interface->create(ctx);
 
-		return pifantuner;
+		return ctx;
 error:
-		pifantuner_destroy(pifantuner);
+		pifantuner_destroy(ctx);
 		return NULL;
 }
 
-void pifantuner_destroy(pifantuner_t *pifantuner) {
-		if (pifantuner) {
-				// reset fan
-				i2c_smbus_write_byte(pifantuner->file, 0x00);
-				close(pifantuner->file);
-				free(pifantuner);
+void pifantuner_destroy(struct pifantuner_ctx *ctx) {
+		if (ctx) {
+				if (ctx->handle) {
+						ctx->interface->destroy(ctx);
+				}
+				free(ctx);
 		}
 }
