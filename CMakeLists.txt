@@ -5,7 +5,7 @@ add_library(pifantuner SHARED src/pifantuner.c src/argon.c)
 target_link_libraries(pifantuner PUBLIC i2c)
 target_include_directories(pifantuner PUBLIC include)
 set_target_properties(pifantuner PROPERTIES PUBLIC_HEADER "include/pifantuner.h")
-set_property(TARGET pifantuner PROPERTY C_STANDARD 17)
+set_property(TARGET pifantuner PROPERTY C_STANDARD 99)
 install(TARGETS pifantuner)
 
 add_executable(pifantunerd src/main.c)
