@@ -44,6 +44,8 @@ static int argon_fan_iface_create(struct pifantuner_ctx* ctx)
     if (!handle) {
         goto error;
     }
+		ctx->handle = handle;
+
     handle->file = open("/dev/i2c-1", O_RDWR);
     if (handle->file < 0) {
         goto error;
@@ -53,7 +55,6 @@ static int argon_fan_iface_create(struct pifantuner_ctx* ctx)
         goto error;
     }
 
-    ctx->handle = handle;
     return 0;
 error:
     argon_fan_iface_destroy(ctx);
