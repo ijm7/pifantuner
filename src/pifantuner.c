@@ -3,12 +3,11 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-#include <fcntl.h>
 
 #include "argon.h"
 
@@ -39,7 +38,9 @@ void pifantuner_poll(const struct pifantuner_ctx* ctx) {
   assert(ctx);
   static const struct pifantuner_map default_settings[] = {
       {55, 10}, {60, 55}, {65, 100}};
+
   const float current_temperature = pifantuner_get_cpu_temperature();
+
   static const size_t settings_size =
       sizeof(default_settings) / sizeof(default_settings[0]);
   uint8_t new_setting = 0;
