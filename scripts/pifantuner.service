@@ -1,0 +1,11 @@
+[Unit]
+Requires=dev-i2c\x2d1.device
+After=dev-i2c\x2d1.device
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/local/bin/pifantunerd
+
+[Install]
+WantedBy=multi-user.target

@@ -18,3 +18,5 @@ install(TARGETS pifantunerd DESTINATION "."
         LIBRARY DESTINATION lib
         )
 
+install(FILES scripts/pifantuner.service DESTINATION /etc/systemd/system)
+install(FILES scripts/99-i2c.rules DESTINATION /etc/udev/rules.d)
