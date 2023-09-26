@@ -25,3 +25,13 @@ make
 ```
 sudo make install
 ```
+
+### Contributing
+
+Install the pre-commit hook prior to performing your first code commit.  
+For more information about pre-commit, [See the pre-commit documentation](https://pre-commit.com/).
+
+#### `pre-commit` Dependencies
+
+* `pre-commit` Python package
+* `clang-format`
