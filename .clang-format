@@ -1,1 +1,6 @@
-BasedOnStyle: Chromium
+BasedOnStyle: LLVM
+ColumnLimit: 80
+IndentWidth: 8
+TabWidth: 8
+Cpp11BracedListStyle: false
+ContinuationIndentWidth: 16
