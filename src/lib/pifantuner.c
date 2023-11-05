@@ -11,6 +11,10 @@
 
 #include "argon.h"
 
+static struct pifantuner_speed_setting default_speed_settings[] = { { 55, 10 },
+																																		{ 60, 55 },
+																																		{ 65, 100 } };
+
 static float pifantuner_get_cpu_temperature(void) {
         static const char cpu_temperature_file[] =
                         "/sys/class/thermal/thermal_zone0/temp";
@@ -34,20 +38,62 @@ error:
         return cpu_temp_degrees;
 }
 
+static struct pifantuner_config *pifantuner_create_config(void) {
+	struct pifantuner_config *config = malloc(sizeof(struct pifantuner_config));
+	if (!config) {
+		goto error;
+	}
+	config->poll_time_seconds = 1;
+
+	config->speed_settings_list.settings = NULL;
+	config->speed_settings_list.count = 0;
+
+error:
+	return NULL;
+}
+
+static void pifantuner_config_destroy(struct pifantuner_config *config) {
+	if (config) {
+		free(config);
+	}
+}
+
+void pifantuner_add_speed_setting(struct pifantuner_ctx *ctx, int temperature, uint8_t speed) {
+	assert(ctx);
+	struct pifantuner_config *config = ctx->config;
+	assert(config);
+	struct pifantuner_speed_setting *settings = config->speed_settings_list.settings;
+	settings = realloc(settings, ++config->speed_settings_list.count);
+	if (settings) {
+		settings->temperature = temperature;
+		settings->speed = speed;
+	}
+}
+
+void pifantuner_clear_speed_settings(struct pifantuner_ctx *ctx) {
+	struct pifantuner_speed_setting *settings = ctx->config->speed_settings_list.settings;
+	if (settings) {
+		free(settings);
+	}
+}
+
 void pifantuner_poll(const struct pifantuner_ctx *ctx) {
         assert(ctx);
-        static const struct pifantuner_map default_settings[] = { { 55, 10 },
-                                                                  { 60, 55 },
-                                                                  { 65, 100 } };
+				assert(ctx->config);
+
+				struct pifantuner_speed_settings_list *const speed_settings_list = &ctx->config->speed_settings_list;
+				if (speed_settings_list->count == 0) {
+					speed_settings_list->settings = default_speed_settings;
+					speed_settings_list->count = sizeof(default_speed_settings) / sizeof(default_speed_settings[0]);
+				}
 
         const float current_temperature = pifantuner_get_cpu_temperature();
 
-        static const size_t settings_size =
-                        sizeof(default_settings) / sizeof(default_settings[0]);
         uint8_t new_setting = 0;
-        for (int i = 0; i < settings_size; i++) {
-                if (current_temperature >= default_settings[i].temperature) {
-                        new_setting = default_settings[i].temperature;
+				assert(speed_settings_list);
+        for (int i = 0; i < speed_settings_list->count; i++) {
+                if (current_temperature >= speed_settings_list->settings[i].temperature) {
+									new_setting = speed_settings_list->settings[i].speed;
                 }
         }
 
@@ -61,8 +107,16 @@ struct pifantuner_ctx *pifantuner_create(void) {
         if (!ctx) {
                 goto error;
         }
+
         ctx->interface = &argon_fan_iface;
-        ctx->interface->create(ctx);
+
+				assert(ctx->interface->create);
+				ctx->interface->create(ctx);
+
+				ctx->config = pifantuner_create_config();
+				if (!ctx->config) {
+					goto error;
+				}
 
         return ctx;
 error:
@@ -75,6 +129,12 @@ void pifantuner_destroy(struct pifantuner_ctx *ctx) {
                 if (ctx->handle) {
                         ctx->interface->destroy(ctx);
                 }
+								if (ctx->config) {
+									if (ctx->config->speed_settings_list.settings) {
+										pifantuner_clear_speed_settings(ctx);
+									}
+									pifantuner_config_destroy(ctx->config);
+								}
                 free(ctx);
         }
 }

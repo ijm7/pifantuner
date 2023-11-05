@@ -11,7 +11,7 @@ install(TARGETS pifantuner)
 add_executable(pifantunerd src/daemon/main.c)
 set_property(TARGET pifantunerd PROPERTY C_STANDARD 17)
 target_include_directories(pifantunerd PUBLIC include)
-target_link_libraries(pifantunerd PRIVATE pifantuner)
+# TODO target_link_libraries(pifantunerd PRIVATE pifantuner fyaml)
 install(TARGETS pifantunerd DESTINATION "."
         RUNTIME DESTINATION bin
         ARCHIVE DESTINATION lib
