@@ -49,6 +49,7 @@ static struct pifantuner_config *pifantuner_create_config(void) {
         config->speed_settings_list.settings = NULL;
         config->speed_settings_list.count = 0;
 
+        return config;
 error:
         return NULL;
 }
