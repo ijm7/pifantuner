@@ -19,7 +19,7 @@ static void run_daemon(const struct pifantuner_ctx *ctx) {
 
 int main(int argc, char **argv) {
         signal(SIGINT, signal_handler);
-        struct pifantuner_ctx *ctx = pifantuner_create();
+        struct pifantuner_ctx *ctx = pifantuner_create(NULL);
         if (!ctx) {
                 return 1;
         }
