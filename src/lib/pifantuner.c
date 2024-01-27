@@ -15,6 +15,10 @@ static struct pifantuner_speed_setting default_speed_settings[] = {
         { 55, 10 }, { 60, 55 }, { 65, 100 }
 };
 
+static struct pifantuner_speed_settings_list default_speed_settings_list = {
+        .settings = default_speed_settings, .count = 3
+};
+
 static float pifantuner_get_cpu_temperature(void) {
         static const char cpu_temperature_file[] =
                         "/sys/class/thermal/thermal_zone0/temp";
@@ -99,18 +103,14 @@ void pifantuner_clear_speed_settings(struct pifantuner_ctx *ctx) {
         }
 }
 
-#include <inttypes.h>
-
 void pifantuner_poll(const struct pifantuner_ctx *ctx) {
         assert(ctx);
         assert(ctx->config);
 
-        struct pifantuner_speed_settings_list *const speed_settings_list =
+        struct pifantuner_speed_settings_list *speed_settings_list =
                         &ctx->config->speed_settings_list;
         if (speed_settings_list->count == 0) {
-                speed_settings_list->settings = default_speed_settings;
-                speed_settings_list->count = sizeof(default_speed_settings) /
-                                             sizeof(default_speed_settings[0]);
+                speed_settings_list = &default_speed_settings_list;
         }
 
         const float current_temperature = pifantuner_get_cpu_temperature();
