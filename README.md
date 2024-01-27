@@ -26,12 +26,14 @@ make
 sudo make install
 ```
 
+### Running `pifantunerd`
+
+A systemd service is installed. Alternatively the daemon may be invoked directly:
+```
+Usage: ./pifantunerd temperature:speed temperature:speed ..
+```
+
 ### Contributing
 
 Install the pre-commit hook prior to performing your first code commit.  
 For more information about pre-commit, [See the pre-commit documentation](https://pre-commit.com/).
-
-#### `pre-commit` Dependencies
-
-* `pre-commit` Python package
-* `clang-format`
