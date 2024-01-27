@@ -65,12 +65,29 @@ void pifantuner_add_speed_setting(struct pifantuner_ctx *ctx, int temperature,
         assert(ctx);
         struct pifantuner_config *config = ctx->config;
         assert(config);
-        struct pifantuner_speed_setting *settings =
-                        config->speed_settings_list.settings;
-        settings = realloc(settings, ++config->speed_settings_list.count);
-        if (settings) {
-                settings->temperature = temperature;
-                settings->speed = speed;
+        struct pifantuner_speed_settings_list *settings_list =
+                        &config->speed_settings_list;
+        assert(settings_list);
+
+        if (settings_list->settings) {
+                assert(settings_list->count > 0);
+                settings_list->settings = realloc(
+                                settings_list->settings,
+                                (++settings_list->count) *
+                                                sizeof(struct
+                                                       pifantuner_speed_setting));
+        } else {
+                assert(settings_list->count == 0);
+                settings_list->settings =
+                                malloc(sizeof(struct pifantuner_speed_setting));
+                ++settings_list->count;
+        }
+
+        if (settings_list->settings) {
+                assert(settings_list->count > 0);
+                size_t setting = settings_list->count - 1;
+                settings_list->settings[setting].temperature = temperature;
+                settings_list->settings[setting].speed = speed;
         }
 }
 
@@ -81,6 +98,8 @@ void pifantuner_clear_speed_settings(struct pifantuner_ctx *ctx) {
                 free(settings);
         }
 }
+
+#include <inttypes.h>
 
 void pifantuner_poll(const struct pifantuner_ctx *ctx) {
         assert(ctx);
@@ -117,6 +136,7 @@ struct pifantuner_ctx *pifantuner_create(void) {
         }
 
         ctx->interface = &argon_fan_iface;
+        ctx->handle = NULL;
 
         assert(ctx->interface->create);
         ctx->interface->create(ctx);
